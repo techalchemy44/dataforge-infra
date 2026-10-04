@@ -1,0 +1,25 @@
+cat > .gitignore <<'EOF'
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+
+# Kubernetes generated/local files
+*.log
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+
+# Helm
+*.tgz
+
+# Local environment/config
+.env
+.env.*
+!.env.example
+EOF
