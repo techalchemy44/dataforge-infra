@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: hdfs-namenode
+  namespace: dataforge
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hdfs-namenode
+  namespace: dataforge
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hdfs-namenode
+  template:
+    metadata:
+      labels:
+        app: hdfs-namenode
+    spec:
+      containers:
+        - name: namenode
+          image: ghcr.io/apache/hadoop:3.5.0
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/bash
+            - -c
+            - |
+              if [ ! -d /data/name/current ]; then
+                hdfs namenode -format -force
+              fi
+              exec hdfs namenode
+          ports:
+            - name: rpc
+              containerPort: 8020
+            - name: http
+              containerPort: 9870
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "750m"
+              memory: "1Gi"
+          volumeMounts:
+            - name: config
+              mountPath: /opt/hadoop/etc/hadoop/core-site.xml
+              subPath: core-site.xml
+            - name: config
+              mountPath: /opt/hadoop/etc/hadoop/hdfs-site.xml
+              subPath: hdfs-site.xml
+            - name: namenode-data
+              mountPath: /data/name
+      volumes:
+        - name: config
+          configMap:
+            name: hdfs-config
+        - name: namenode-data
+          persistentVolumeClaim:
+            claimName: hdfs-namenode
