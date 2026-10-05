@@ -1,0 +1,16 @@
+# Apache Spark Kubernetes Operator
+# Chart: 1.8.0
+# Operator: 1.0.0
+
+image:
+  repository: apache/spark-kubernetes-operator
+  tag: "1.0.0"
+  pullPolicy: IfNotPresent
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+  limits:
+    cpu: "250m"
+    memory: "256Mi"
